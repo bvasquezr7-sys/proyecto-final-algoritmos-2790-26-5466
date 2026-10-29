@@ -9,10 +9,17 @@ int main() {
     double totalDia = 0.0;
     double prom = 0.0;
 
-    // variables para la venta
+    // variables para la venta y cobro
     double precio = 0.0;
     int cant = 0;
     double subtotal = 0.0;
+    double porcDesc = 0.0;
+    double desc = 0.0;
+    double subConDesc = 0.0;
+    double iva = 0.0;
+    double total = 0.0;
+    double pago = 0.0;
+    double cambio = 0.0;
 
     cout << fixed << setprecision(2);
 
@@ -53,12 +60,10 @@ int main() {
                     }
                     cin.ignore(1000, '\n');
 
-                    // si no es 0 pedimos la cantidad
                     if (precio > 0.0) {
                         cout << "Cantidad (1 a 100): ";
                         cin >> cant;
 
-                        // corregido: asegurar que el subtotal inicie en 0 y cantidad no pase de 100
                         while (cin.fail() || cant < 1 || cant > 100) {
                             cin.clear();
                             cin.ignore(1000, '\n');
@@ -72,7 +77,51 @@ int main() {
                     }
                 }
 
-                cout << "\nSubtotal final de la venta: $" << subtotal << "\n";
+                // solo cobramos si compraron algo
+                if (subtotal > 0.0) {
+                    // saca el porcentaje de descuento segun el subtotal
+                    if (subtotal < 100.0) {
+                        porcDesc = 0.0;
+                    } else if (subtotal < 500.0) {
+                        porcDesc = 0.05;
+                    } else {
+                        porcDesc = 0.10;
+                    }
+
+                    desc = subtotal * porcDesc;
+                    subConDesc = subtotal - desc;
+                    iva = subConDesc * 0.12;
+                    total = subConDesc + iva;
+
+                    cout << "\nTotal a pagar (con IVA): $" << total << endl;
+                    cout << "Con cuanto paga el cliente?: $";
+                    cin >> pago;
+
+                    // corregido: ciclo para obligar a que el pago alcance a cubrir el total
+                    while (cin.fail() || pago < total) {
+                        cin.clear();
+                        cin.ignore(1000, '\n');
+                        cout << "Pago insuficiente o invalido. Debe ser al menos $" << total << ": $";
+                        cin >> pago;
+                    }
+                    cin.ignore(1000, '\n');
+
+                    cambio = pago - total;
+
+                    // impresion del recibo con 2 decimales
+                    cout << "\n========== RECIBO DE VENTA ==========\n";
+                    cout << "Subtotal:              $" << subtotal << endl;
+                    cout << "Descuento (" << (porcDesc * 100) << "%):     -$" << desc << endl;
+                    cout << "Subtotal c/descuento:  $" << subConDesc << endl;
+                    cout << "IVA (12%):            +$" << iva << endl;
+                    cout << "-------------------------------------\n";
+                    cout << "TOTAL:                 $" << total << endl;
+                    cout << "Pago recibido:         $" << pago << endl;
+                    cout << "Cambio:                $" << cambio << "\n";
+                    cout << "=====================================" << endl;
+                } else {
+                    cout << "\nNo se ingresaron productos, venta cancelada.\n";
+                }
                 break;
 
             case 2:
